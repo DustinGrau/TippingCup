@@ -1,5 +1,5 @@
 /**
- * Matilda the Musical - Tipping Cup
+ * Matilda the Musical - Magical Tipping Cup
  */
 
 #include <Servo.h>
