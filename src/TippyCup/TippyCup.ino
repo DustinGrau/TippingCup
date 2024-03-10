@@ -35,21 +35,21 @@ void loop() {
     // Always reset if anything other than
     // the default (upright) position.
     if(resetPosition()) {
-      delay(random(100,400)); // Delay before next action
+      delay(random(200,500)); // Delay before next action
     }
 
     servoPos = random(20,60);
     mainServo.write(servoPos);
-    delay(random(200,500)); // Delay before next action
+    delay(random(100,400)); // Delay before next action
   } else {
-    // Check if A1 is HIGH
+    // Check if A1 is HIGH (reset)
     if (sensorValueA1 > 600) {
       resetPosition();
       delay(500); // Delay before next action
       b_tipped = false; // Reset for next tipping event
     }
 
-    // Check if A2 is HIGH
+    // Check if A2 is HIGH (tip)
     if (sensorValueA2 > 600 && !b_tipped) {
       // Turn the servo 180 degrees (tipped)
       servoPos = 180;
