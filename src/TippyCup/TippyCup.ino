@@ -20,7 +20,7 @@ void setup() {
 
   mainServo.attach(servoPin);
   delay(10);
-  mainServo.write(0); // Reset to a known position.
+  mainServo.write(0); // Reset to a known position
 }
 
 void loop() {
@@ -32,15 +32,13 @@ void loop() {
   // Check if A5 is HIGH, meaning the device
   // should be doing a wobble action
   if (sensorValueA5 > 600) {
-    // Always reset if anything other than
-    // the default (upright) position.
-    if(resetPosition()) {
-      delay(random(200,500)); // Delay before next action
-    }
-
-    // Move the servo some random angle, over some random period, every 20ms.
-    servoPos = moveServo(random(20,60), random(200,400), 20);
+    // Move the servo some random angle, over some random period, every 20ms
+    servoPos = moveServo(random(20,60), random(200,400), 10);
     delay(random(100,400)); // Delay before next action
+
+    // Always reset to the default (upright) position, slowly
+    servoPos = moveServo(0, 500, 10);
+    delay(random(200,500)); // Delay before next action
   } else {
     // Check if A1 is HIGH (reset)
     if (sensorValueA1 > 600) {
@@ -51,14 +49,14 @@ void loop() {
 
     // Check if A2 is HIGH (tip)
     if (sensorValueA2 > 600 && !b_tipped) {
-      // Turn the servo 180 degrees (tipped)
-      servoPos = 180;
-      mainServo.write(servoPos);
-      delay(250); // Delay before next action
+      // Immediately rotate the servo 180 degrees (tipped)
+      mainServo.write(180);
+      servoPos = mainServo.read();
+      delay(500); // Delay before next action
 
       // Return to a reset position
       resetPosition();
-      delay(500); // Delay before next action
+      delay(1000); // Delay before next action
 
       // Set latch to ensure sensor state only
       // causes a single servo/tipping event
@@ -68,21 +66,20 @@ void loop() {
 }
 
 uint16_t moveServo(uint16_t i_servo_angle, uint16_t i_move_time, uint16_t i_step_time) {
-  int startPos = mainServo.read(); // Get the current position of the servo
-  int targetPos = startPos + i_servo_angle; // Set the target position N degrees ahead
+  resetPosition(); // First reset to a known 0 angle
 
   unsigned long startTime = millis(); // Get the current time
 
   while (millis() - startTime < i_move_time) {
     // Move the servo gradually to the target position
-    int currentPos = map(millis(), startTime, startTime + i_move_time, startPos, targetPos);
+    int currentPos = map(millis(), startTime, startTime + i_move_time, 0, i_servo_angle);
     mainServo.write(currentPos);
     delay(i_step_time); // Adjust the delay to control the speed of the movement
   }
 
-  mainServo.write(targetPos); // Ensure the servo reaches the exact target position
+  mainServo.write(i_servo_angle); // Ensure the servo reaches the exact target position
 
-  return targetPos; // Return the new target position for the servo
+  return i_servo_angle; // Return the new target position for the servo
 }
 
 boolean resetPosition() {
