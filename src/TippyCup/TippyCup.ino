@@ -38,8 +38,8 @@ void loop() {
       delay(random(200,500)); // Delay before next action
     }
 
-    servoPos = random(20,60);
-    mainServo.write(servoPos);
+    // Move the servo some random angle, over some random period, every 20ms.
+    servoPos = moveServo(random(20,60), random(200,400), 20);
     delay(random(100,400)); // Delay before next action
   } else {
     // Check if A1 is HIGH (reset)
@@ -67,11 +67,29 @@ void loop() {
   }
 }
 
+uint16_t moveServo(uint16_t i_servo_angle, uint16_t i_move_time, uint16_t i_step_time) {
+  int startPos = mainServo.read(); // Get the current position of the servo
+  int targetPos = startPos + i_servo_angle; // Set the target position N degrees ahead
+
+  unsigned long startTime = millis(); // Get the current time
+
+  while (millis() - startTime < i_move_time) {
+    // Move the servo gradually to the target position
+    int currentPos = map(millis(), startTime, startTime + i_move_time, startPos, targetPos);
+    mainServo.write(currentPos);
+    delay(i_step_time); // Adjust the delay to control the speed of the movement
+  }
+
+  mainServo.write(targetPos); // Ensure the servo reaches the exact target position
+
+  return targetPos; // Return the new target position for the servo
+}
+
 boolean resetPosition() {
   boolean b_changed = false;
 
   // Return the servo to 0 degrees (upright)
-  if(servoPos > 0) {
+  if(mainServo.read() > 0) {
     servoPos = 0;
     b_changed = true;
     mainServo.write(servoPos);
