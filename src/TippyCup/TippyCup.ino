@@ -8,12 +8,15 @@ const int analogPinA1 = A1; // A1 pin, maps to the DOWN or RIGHT button on remot
 const int analogPinA2 = A2; // A2 pin, maps to the UP or LEFT button on remote
 const int analogPinA5 = A5; // A5 pin, maps to the TOGGLE button on remote
 const int servoPin = 9;     // Digital pin for servo control (D9)
+const int highThresh = 500; // Threshold for considering a pin as HIGH 
 uint16_t servoPos = 0;      // Last-known servo position
 boolean b_tipped = false;   // Indicates whether the servo was just in the "tipped" state.
 
 Servo mainServo; // Create a servo object to control a servo motor
 
 void setup() {
+  Serial.begin(9600);
+
   pinMode(analogPinA1, INPUT);
   pinMode(analogPinA2, INPUT);
   pinMode(analogPinA5, INPUT);
@@ -24,14 +27,14 @@ void setup() {
 }
 
 void loop() {
-  // Read the analog inputs
+  // Read the analog values from the input pins.
   int sensorValueA1 = analogRead(analogPinA1);
   int sensorValueA2 = analogRead(analogPinA2);
   int sensorValueA5 = analogRead(analogPinA5);
 
   // Check if A5 is HIGH, meaning the device
   // should be doing a wobble action
-  if (sensorValueA5 > 600) {
+  if (sensorValueA5 > highThresh) {
     // Move the servo some random angle, over some random period, every 20ms
     servoPos = moveServo(random(20,60), random(200,400), 10);
     delay(random(100,400)); // Delay before next action
@@ -41,22 +44,25 @@ void loop() {
     delay(random(200,500)); // Delay before next action
   } else {
     // Check if A1 is HIGH (reset)
-    if (sensorValueA1 > 600) {
-      resetPosition();
-      delay(500); // Delay before next action
-      b_tipped = false; // Reset for next tipping event
+    if (sensorValueA1 > highThresh) {
+      if (resetPosition()) {
+        delay(500); // Delay before next action
+      }
+
+      // Reset for next tipping event
+      b_tipped = false;
     }
 
     // Check if A2 is HIGH (tip)
-    if (sensorValueA2 > 600 && !b_tipped) {
+    if (sensorValueA2 > highThresh && !b_tipped) {
       // Immediately rotate the servo 180 degrees (tipped)
-      mainServo.write(180);
-      servoPos = mainServo.read();
+      servoPos = moveServo(180, 100, 10);
       delay(500); // Delay before next action
 
       // Return to a reset position
-      resetPosition();
-      delay(1000); // Delay before next action
+      if (resetPosition()) {
+        delay(1000); // Delay before next action
+      }
 
       // Set latch to ensure sensor state only
       // causes a single servo/tipping event
