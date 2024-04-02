@@ -1,5 +1,7 @@
 /**
- * Matilda the Musical - Magical Tipping Cup
+ * Tipping Cup Prop
+ * Detects voltage from specific pins on an Arduino Nano from an RC remote receiver.
+ * Can operate in a "wobble" mode or fully "tip" when mounted inside a tall object.
  */
 
 #include <Servo.h>
