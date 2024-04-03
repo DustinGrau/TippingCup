@@ -42,8 +42,8 @@ void loop() {
     delay(random(100, 400)); // Delay before next action
 
     // Always reset to the default (upright) position, slowly
-    servoPos = moveServo(0, 2000, 20);
-    delay(random(300, 600)); // Delay before next action
+    servoPos = moveServo(0, 500, 10);
+    delay(random(300, 500)); // Delay before next action
   } else {
     // Check if A1 is HIGH (reset)
     if (sensorValueA1 > highThresh) {
@@ -74,13 +74,15 @@ void loop() {
 }
 
 uint16_t moveServo(uint16_t i_servo_angle, uint16_t i_move_time, uint16_t i_step_time) {
-  resetPosition(); // First reset to a known 0 angle
+  if(i_servo_angle > 0) {
+    resetPosition(); // First reset to a known 0 angle if moved to a different position
+  }
 
   unsigned long startTime = millis(); // Get the current time
 
   while (millis() - startTime < i_move_time) {
     // Move the servo gradually to the target position
-    int currentPos = map(millis(), startTime, startTime + i_move_time, 0, i_servo_angle);
+    int currentPos = map(millis(), startTime, startTime + i_move_time, servoPos, i_servo_angle);
     mainServo.write(currentPos);
     delay(i_step_time); // Adjust the delay to control the speed of the movement
   }
@@ -95,9 +97,9 @@ boolean resetPosition() {
 
   // Immediately return the servo to 0 degrees (fully upright)
   if(mainServo.read() > 0) {
-    servoPos = 0;
-    b_changed = true;
-    mainServo.write(servoPos);
+    mainServo.write(0); // Sets the desired position
+    servoPos = mainServo.read(); // Confirm position
+    b_changed = true; // Indicate change of position
   }
 
   return b_changed;
