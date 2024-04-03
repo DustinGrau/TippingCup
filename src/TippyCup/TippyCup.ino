@@ -38,11 +38,15 @@ void loop() {
   // should be doing a wobble action
   if (sensorValueA5 > highThresh) {
     // Move the servo some random angle, over some random period, every 10ms
-    servoPos = moveServo(random(20, 50), random(200, 400), 10);
-    delay(random(100, 400)); // Delay before next action
+    servoPos = moveServo(random(20, 45), random(200, 400), 10);
+    delay(random(100, 300)); // Delay before next action
+
+    // Add a very small movement at the peak of the last angle
+    servoPos = moveServo(servoPos + 5, 300, 10);
+    delay(random(200, 300)); // Delay before next action
 
     // Always reset to the default (upright) position, slowly
-    servoPos = moveServo(0, 500, 10);
+    servoPos = moveServo(0, 600, 10);
     delay(random(300, 500)); // Delay before next action
   } else {
     // Check if A1 is HIGH (reset)
@@ -74,10 +78,6 @@ void loop() {
 }
 
 uint16_t moveServo(uint16_t i_servo_angle, uint16_t i_move_time, uint16_t i_step_time) {
-  if(i_servo_angle > 0) {
-    resetPosition(); // First reset to a known 0 angle if moved to a different position
-  }
-
   unsigned long startTime = millis(); // Get the current time
 
   while (millis() - startTime < i_move_time) {
