@@ -54,9 +54,9 @@ For the Arduino Nano these are the pins used for power and the radio receiver:
 
 For the Servo these are the connections needed to the Arduino Nano:
 
-- Power to `3v3`
-- Data to `D9`
-- Ground to any open `GND` (or share with - on the buck converter)
+- Red - Power to Buck output (+)
+- Yellow - Data to `D9`
+- Brown - Ground to Buck output (-)
 
 ![](images/full_circuit.jpg)
 
