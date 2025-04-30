@@ -35,11 +35,12 @@ The motors, speaker, and battery connections will be cut away, leaving only the 
 
 For power I used a 9V battery due to its availability and ability to provide enough current to the servo. This is connected to the buck converter which is set to 5V for output, which is what's expected by the Arduino and receiver. Note that it is a good idea to put a switch on the positive wire so you can easily turn off the device--leaving it on will cause the radio receiver to drain the battery.
 
-`9V Battery --> Switch (positive) --> Buck Converter (Input)`
+`9V Battery --> Switch (positive) --> Buck Converter + (Input)`
+`9V Battery --> Ground (negative) --> Buck Converter - (Input)`
 
-The output of the buck converter is split to the Arduino and the receiver to power both devices at the same time.
+The output of the buck converter is split to the Arduino and Servo motor to power both devices at the same time.
 
-`Buck Converter (Output) --> Arduino Nano (VIN/GND) and -B+ on PCB`
+`Buck Converter (Output) --> Arduino Nano (VIN/GND) and Red/Brown on Servo`
 
 For the Arduino Nano these are the pins used for power and the radio receiver:
 
@@ -51,12 +52,14 @@ For the Arduino Nano these are the pins used for power and the radio receiver:
 - `A4` to PCB `R`
 - `A5` to PCB `M+`
 - `A6` to PCB `M-`
+- `GND` to Receiver B (-)
+- `3v3` to Receiver B (+)
 
 For the Servo these are the connections needed to the Arduino Nano:
 
-- Red - Power to Buck output (+)
-- Yellow - Data to `D9`
-- Brown - Ground to Buck output (-)
+- Red (Power) to Buck output (+)
+- Yellow (Data) to `D9` on Arduino Nano
+- Brown (Ground) to Buck output (-)
 
 ![](images/full_circuit.jpg)
 
